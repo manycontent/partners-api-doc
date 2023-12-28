@@ -1,9 +1,10 @@
 ## Descrição
 Este documento tem como finalidade instruir como deve ser feita a integração com a Manycontent.
-Foram desenvolvidos 2 serviços para essa integração: **"Criar assinatura para um cliente"** e **"Autenticação do cliente por token"**.
+Foram desenvolvidos 3 serviços para essa integração:
 
 - `Criar assinatura para um cliente`: O Parceito da Manycontent cadastra seu cliente na plataforma da Manycontent;
 - `Autenticação do cliente por token`: O cliente do parceiro acessa a Manycontent a partir da aplicação do parceiro utilizando tokens de acesso;
+- `Listar contas do parceiro`: O parceiro recebe uma listagem com todos as contas cadastradas e seus respectivos perfís;
 
 ## Requisições autenticadas
 
@@ -105,6 +106,7 @@ nonce: 1686315889
     "email": "email@do.cliente"
   },
   "checkoutId": "X84CUnzQzMqCBdOXThHy" // Id que representa o plano que será assinado na Manycontent
+  "profileID": "zQzX84hHyCUnMqXTCBdO" // Usado apenas se desejar ativar um perfil específico criado por um usuário. Quando não informado um novo perfil é criado
 }
 ```
 
@@ -113,6 +115,8 @@ Todos os campos do corpo da requisição são obrigatórios com exceção de "**
 Os campos "**phone**", "**name**" e "**email**" precisam ser referentes aos dados do usuário.
 
 Os campos referentes a "**document**" e "**address**" podem ser ou do cliente ou do Parceiro (Para o caso de decidirem não compartilhar ĩnformações pessoais dos clientes).
+
+O campo "**profileID**" é usado apenas se desejar ativar um perfil específico criado por um usuário. Quando não informado um novo perfil é criado.
 
 ### Retorno da requisição
 
@@ -149,4 +153,50 @@ const getLoginURL = (token, secret) => {
 const loginURL = getLoginURL('G_tbGOzqKm2uWpiJClsg31l5nrfDzSY7Johg89t_nj4', '47E2PZ4S7PW6FI4DTEC2S7NVQ644GMED')
 
 console.log(loginURL)
+```
+
+## Listar contas do parceiro
+
+Endpoint: `https://us-central1-manycontent-v2-prod.cloudfunctions.net/api/accounts`  
+Método: `GET`  
+Requisição autenticada: `Sim`  
+
+### Header da requisição
+
+```json
+// Dados fictícios
+content-type: application/json
+api-key: YKln519iY4n_S6H0H1t0sGKcykIWWdMBHYNXt1QK9lS
+api-sign: Tn1Ayct79PL2nB0K9cPf6c6G+xTvI8RVZ6a61FDMKUfwJck4UEAfDJ2euTq+vsXpXJVGYnQtd96r4ZGrqiTVYQ==
+nonce: 1686315889
+```
+
+### Resposta da requisição (payload)
+
+```json
+[
+  {
+    "email": "developers_3@manycontent.com",
+    "profiles": [
+      {
+        "profileId": "DYYCQBKwS3Tgg4crRxGq",
+        "profileName": "Profile_1",
+        "createdAt": "2023-12-27T15:59:00.252Z",
+        "isActive": true
+      },
+      {
+        "profileId": "J3JB53WYzsuJ4iXIbNU9",
+        "profileName": "Profile_2",
+        "createdAt": "2023-12-08T16:25:30.904Z",
+        "isActive": true
+      },
+      {
+        "profileId": "pN9uOksN1egsZfNF2XEp",
+        "profileName": "Profile_3",
+        "createdAt": "2023-12-21T09:38:26.037Z",
+        "isActive": false
+      }
+    ]
+  }
+]
 ```
